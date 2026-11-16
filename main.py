@@ -48,11 +48,13 @@ class Player:
         if keys[self.controls['right']]:
             self.vel_x = 1
         if keys[self.controls['jump']] and self.on_platform:
-            self.vel_y = -5
+            self.vel_y = -14
             self.on_platform = False
     def update(self, platforms):
         self.key_input()
         self.vel_y += gravity
+        if self.vel_y > 10:
+            self.vel_y = 10
         self.rect.x += self.vel_x
         for platform in platforms:
             if self.rect.colliderect(platform):
@@ -67,7 +69,7 @@ class Player:
             if self.vel_y > 0:
                 self.rect.bottom = platform.top
                 self.vel_y = 0
-                self.on_ground = True
+                self.on_platform = True
     def draw(self, surface):
         py.draw.rect(surface, self.color, (round(self.rect.x), self.rect.y, self.rect.width, self.rect.height))
 

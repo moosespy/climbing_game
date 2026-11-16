@@ -47,12 +47,13 @@ class Player:
             self.vel_x = -1
         if keys[self.controls['right']]:
             self.vel_x = 1
-        if keys[self.controls['jump']] and self.on_platform():
+        if keys[self.controls['jump']] and self.on_platform:
             self.vel_y = -5
             self.on_platform = False
     def update(self, platforms):
         self.key_input()
         self.vel_y += gravity
+        self.rect.x += self.vel_x
         for platform in platforms:
             if self.rect.colliderect(platform):
                 if self.vel_x > 0:
@@ -80,6 +81,9 @@ while run:
     for event in py.event.get():
         if event.type == py.QUIT:
             run = False
+    
+    player.update(platforms)
+    
     player_surf.blit(bg, (0, 0))
     for platform in platforms:
         player_surf.blit(platform_surf, (platform.x, platform.y))
@@ -87,3 +91,6 @@ while run:
     screen.blit(player_surf, (0, 0))
     py.display.flip()
     clock.tick(60)
+
+py.quit()
+sys.exit()

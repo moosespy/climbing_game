@@ -3,7 +3,7 @@ import sys
 py.init()
 width = 500
 height = 600
-screen = py.display.set_mode((width, height), py.DOUBLEBUF)
+screen = py.display.set_mode((width, height), flags=py.SCALED, vsync=1)
 clock = py.time.Clock()
 
 player_surf = py.Surface((width, height))
@@ -14,7 +14,7 @@ black = [0, 0, 0]
 gray = [128, 128, 128]
 sky_blue = [135, 206, 235]
 
-gravity = 1
+gravity = 3600
 
 def draw_gradient(w, h, c_top, c_bottom):
     bg_surf = py.Surface((1, 2))
@@ -34,6 +34,7 @@ platforms = [
 ]
 class Player:
     def __init__(self, x, y, color, controls):
+        self.x, self.y = float(x), float(y)
         self.rect = py.Rect(x, y, 18, 18)
         self.vel_x = 0
         self.vel_y = 0
@@ -44,34 +45,41 @@ class Player:
         keys = py.key.get_pressed()
         self.vel_x = 0
         if keys[self.controls['left']]:
-            self.vel_x = -1
+            self.vel_x = -3600 * dt
         if keys[self.controls['right']]:
-            self.vel_x = 1
+            self.vel_x = 3600 * dt
         if keys[self.controls['jump']] and self.on_platform:
-            self.vel_y = -14
+            self.vel_y = -54000 * dt
             self.on_platform = False
     def update(self, platforms):
         self.key_input()
-        self.vel_y += gravity
-        if self.vel_y > 10:
-            self.vel_y = 10
-        self.rect.x += self.vel_x
+        self.vel_y += gravity * dt
+        if self.vel_y > 600:
+            self.vel_y = 600
+        
+        self.x += self.vel_x * dt
+        self.rect.x = round(self.x)
         for platform in platforms:
             if self.rect.colliderect(platform):
                 if self.vel_x > 0:
                     self.rect.right = platform.left
                 if self.vel_x < 0:                        
                     self.rect.left = platform.right
-        self.rect.y += self.vel_y
+                self.x = float(self.rect.x)
+        
+        self.y += self.vel_y * dt
+        self.rect.y = round(self.y)
         hit_indices = self.rect.collidelistall(platforms)
         for index in hit_indices:
             platform = platforms[index]
             if self.vel_y > 0:
                 self.rect.bottom = platform.top
+                self.y = float(self.rect.y)
                 self.vel_y = 0
                 self.on_platform = True
+
     def draw(self, surface):
-        py.draw.rect(surface, self.color, (round(self.rect.x), self.rect.y, self.rect.width, self.rect.height))
+        py.draw.rect(surface, self.color, self.rect)
 
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
 player = Player(220, 0, blue, controls)
@@ -84,6 +92,8 @@ while run:
         if event.type == py.QUIT:
             run = False
     
+    dt = min(clock.tick(300) / 1000.0, 0.05)
+
     player.update(platforms)
     
     player_surf.blit(bg, (0, 0))
@@ -92,7 +102,6 @@ while run:
     player.draw(player_surf)
     screen.blit(player_surf, (0, 0))
     py.display.flip()
-    clock.tick(60)
 
 py.quit()
 sys.exit()

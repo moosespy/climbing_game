@@ -3,7 +3,7 @@ import sys
 py.init()
 width = 500
 height = 600
-screen = py.display.set_mode((width, height), flags=py.SCALED, vsync=1)
+screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 
 player_surf = py.Surface((width, height))
@@ -14,7 +14,7 @@ black = [0, 0, 0]
 gray = [128, 128, 128]
 sky_blue = [135, 206, 235]
 
-gravity = 3600
+gravity = 1 * 60
 
 def draw_gradient(w, h, c_top, c_bottom):
     bg_surf = py.Surface((1, 2))
@@ -45,17 +45,17 @@ class Player:
         keys = py.key.get_pressed()
         self.vel_x = 0
         if keys[self.controls['left']]:
-            self.vel_x = -3600 * dt
+            self.vel_x = -1 * 60
         if keys[self.controls['right']]:
-            self.vel_x = 3600 * dt
+            self.vel_x = 1 * 60
         if keys[self.controls['jump']] and self.on_platform:
-            self.vel_y = -54000 * dt
+            self.vel_y = -14 * 60
             self.on_platform = False
     def update(self, platforms):
         self.key_input()
-        self.vel_y += gravity * dt
-        if self.vel_y > 600:
-            self.vel_y = 600
+        self.vel_y += gravity
+        if self.vel_y > 10 * 60:
+            self.vel_y = 10 * 60
         
         self.x += self.vel_x * dt
         self.rect.x = round(self.x)
@@ -92,7 +92,7 @@ while run:
         if event.type == py.QUIT:
             run = False
     
-    dt = min(clock.tick(300) / 1000.0, 0.05)
+    dt = min(clock.tick(45) / 1000, 0.05)
 
     player.update(platforms)
     
@@ -101,7 +101,7 @@ while run:
         player_surf.blit(platform_surf, (platform.x, platform.y))
     player.draw(player_surf)
     screen.blit(player_surf, (0, 0))
-    py.display.flip()
+    py.display.update()
 
 py.quit()
 sys.exit()

@@ -6,14 +6,22 @@ height = 600
 screen = py.display.set_mode((width, height), py.DOUBLEBUF)
 clock = py.time.Clock()
 
-player_surf = py.Surface((width, height/2))
+player_surf = py.Surface((width, height))
 
 blue = [0, 0, 255]
 white = [255, 255, 255]
 black = [0, 0, 0]
 gray = [128, 128, 128]
+sky_blue = [135, 206, 235]
 
 gravity = 1
+
+def draw_gradient(w, h, c_top, c_bottom):
+    bg_surf = py.Surface((1, 2))
+    bg_surf.set_at((0, 0), c_top)
+    bg_surf.set_at((0, 1), c_bottom)
+    grad_surf = py.transform.smoothscale(bg_surf, (w, h))
+    return grad_surf.convert()
 
 def draw_platform():
     global platform_surf
@@ -22,7 +30,7 @@ def draw_platform():
     py.draw.polygon(platform_surf, gray, platform_points)
 draw_platform()
 platforms = [
-    platform_surf.get_rect(center = (225, 240))
+    platform_surf.get_rect(center = (225, 500))
 ]
 class Player:
     def __init__(self, x, y, color, controls):
@@ -65,10 +73,17 @@ class Player:
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
 player = Player(220, 0, blue, controls)
 
+bg = draw_gradient(width, height, sky_blue, black)
+
 run = True
 while run:
     for event in py.event.get():
         if event.type == py.QUIT:
             run = False
-    
+    player_surf.blit(bg, (0, 0))
+    for platform in platforms:
+        player_surf.blit(platform_surf, (platform.x, platform.y))
+    player.draw(player_surf)
+    screen.blit(player_surf, (0, 0))
     py.display.flip()
+    clock.tick(60)

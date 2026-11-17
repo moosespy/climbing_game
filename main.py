@@ -89,7 +89,7 @@ class Particle:
         self.size = random.randint(5, 10)
         self.color = color
         self.vel_x = random.uniform(-250, 250)
-        self.vel_y = random.uniform(250, 250)
+        self.vel_y = random.uniform(-250, 250)
         self.shrink_rate = random.uniform(6, 12)
     def update(self, dt):
         self.vel_y += 600 * dt
@@ -127,7 +127,7 @@ while run:
         
         if player.y > level_height:
             gamestate = 'lose'
-            particles = explode(player.rect.centerx, player.rect.centery, white)
+            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, white)
         if player.y < 0:
             gamestate = 'win'
 
@@ -150,7 +150,7 @@ while run:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)
-    elif gamestate == 'lose':
+    if gamestate == 'lose':
         for p in particles:
             p.draw(screen)
     py.display.update()

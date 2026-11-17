@@ -5,6 +5,7 @@ width = 500
 height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
+level_height = 1200
 
 blue = [0, 0, 255]
 white = [255, 255, 255]
@@ -27,9 +28,9 @@ def draw_platform():
     platform_surf = py.Surface((20, 10)).convert()
     py.draw.polygon(platform_surf, gray, platform_points)
 draw_platform()
-platforms = [
-    platform_surf.get_rect(center = (225, 500))
-]
+platforms = []
+for i in range(100):
+    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 100)))
 class Player:
     def __init__(self, x, y, color, controls):
         self.x, self.y = float(x), float(y)
@@ -80,7 +81,7 @@ class Player:
         py.draw.rect(surface, self.color, (self.rect.x, round(self.rect.y - scroll_y), self.rect.width, self.rect.height))
 
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
-player = Player(220, 400, blue, controls)
+player = Player(250, 1200, blue, controls)
 scroll_y = 0
 
 bg = draw_gradient(width, height, sky_blue, black)
@@ -95,10 +96,17 @@ while run:
 
     player.update(platforms)
     
+    if player.y > level_height + 500:
+        run = False
+    if player.y < 0:
+        run = False
+
     target_scroll_y = player.rect.y - (height // 2)
     scroll_y += (target_scroll_y - scroll_y) // 10
     if scroll_y < 0:
         scroll_y = 0
+    if scroll_y > level_height:
+        scroll_y = level_height
 
     screen.blit(bg, (0, 0))
     for platform in platforms:

@@ -1,8 +1,10 @@
 import pygame as py
 import sys
+import random
 py.init()
 width = 500
 height = 600
+
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
@@ -30,7 +32,8 @@ def draw_platform():
 draw_platform()
 platforms = []
 for i in range(100):
-    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 100)))
+    platforms.append(platform_surf.get_rect(center = (250 - 2 * i, level_height - i * 100)))
+
 class Player:
     def __init__(self, x, y, color, controls):
         self.x, self.y = float(x), float(y)
@@ -60,10 +63,10 @@ class Player:
         self.rect.x = round(self.x)
         for platform in platforms:
             if self.rect.colliderect(platform):
-                if self.vel_x > 0:
-                    self.rect.right = platform.left
-                if self.vel_x < 0:                        
+                if self.rect.right >= platform.right:
                     self.rect.left = platform.right
+                if self.rect.left <= platform.left:                        
+                    self.rect.right = platform.left
                 self.x = float(self.rect.x)
         
         self.y += self.vel_y * dt
@@ -85,6 +88,7 @@ player = Player(250, 1200, blue, controls)
 scroll_y = 0
 
 bg = draw_gradient(width, height, sky_blue, black)
+gamestate = 'playing'
 
 run = True
 while run:
@@ -93,20 +97,26 @@ while run:
             run = False
     
     dt = min(clock.tick(45) / 1000, 0.05)
-
-    player.update(platforms)
     
-    if player.y > level_height + 500:
-        run = False
-    if player.y < 0:
-        run = False
+    if gamestate == 'playing':
+        player.update(platforms)
+        
+        if player.y > level_height + 500:
+            gamestate == 'win'
+        if player.y < 0:
+            gamestate == 'lose'
 
-    target_scroll_y = player.rect.y - (height // 2)
-    scroll_y += (target_scroll_y - scroll_y) // 10
-    if scroll_y < 0:
-        scroll_y = 0
-    if scroll_y > level_height:
-        scroll_y = level_height
+        target_scroll_y = player.rect.y - (height // 2)
+        scroll_y += (target_scroll_y - scroll_y) // 10
+        if scroll_y < 0:
+            scroll_y = 0
+        if scroll_y > level_height:
+            scroll_y = level_height
+    
+    if gamestate == 'win':
+        run = False
+    if gamestate == 'lose':
+        run = False
 
     screen.blit(bg, (0, 0))
     for platform in platforms:

@@ -6,8 +6,6 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 
-player_surf = py.Surface((width, height))
-
 blue = [0, 0, 255]
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -78,11 +76,12 @@ class Player:
                 self.vel_y = 0
                 self.on_platform = True
 
-    def draw(self, surface):
-        py.draw.rect(surface, self.color, self.rect)
+    def draw(self, surface, scroll_y):
+        py.draw.rect(surface, self.color, (self.rect.x, round(self.rect.y - scroll_y), self.rect.width, self.rect.height))
 
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
-player = Player(220, 0, blue, controls)
+player = Player(220, 400, blue, controls)
+scroll_y = 0
 
 bg = draw_gradient(width, height, sky_blue, black)
 
@@ -96,11 +95,15 @@ while run:
 
     player.update(platforms)
     
-    player_surf.blit(bg, (0, 0))
+    target_scroll_y = player.rect.y - (height // 2)
+    scroll_y += (target_scroll_y - scroll_y) // 10
+    if scroll_y < 0:
+        scroll_y = 0
+
+    screen.blit(bg, (0, 0))
     for platform in platforms:
-        player_surf.blit(platform_surf, (platform.x, platform.y))
-    player.draw(player_surf)
-    screen.blit(player_surf, (0, 0))
+        screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
+    player.draw(screen, scroll_y)
     py.display.update()
 
 py.quit()

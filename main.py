@@ -32,7 +32,7 @@ def draw_platform():
 draw_platform()
 platforms = []
 for i in range(100):
-    platforms.append(platform_surf.get_rect(center = (250 - 2 * i, level_height - i * 100)))
+    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 100)))
 
 class Player:
     def __init__(self, x, y, color, controls):
@@ -63,9 +63,9 @@ class Player:
         self.rect.x = round(self.x)
         for platform in platforms:
             if self.rect.colliderect(platform):
-                if self.rect.right >= platform.right:
+                if self.rect.right >= platform.right and self.vel_x < 0:
                     self.rect.left = platform.right
-                if self.rect.left <= platform.left:                        
+                if self.rect.left <= platform.left and self.vel_x > 0:                        
                     self.rect.right = platform.left
                 self.x = float(self.rect.x)
         
@@ -82,11 +82,35 @@ class Player:
 
     def draw(self, surface, scroll_y):
         py.draw.rect(surface, self.color, (self.rect.x, round(self.rect.y - scroll_y), self.rect.width, self.rect.height))
+class Particle:
+    def __init__(self, x, y, color):
+        self.x = float(x)
+        self.y = float(y)
+        self.size = random.randint(5, 10)
+        self.color = color
+        self.vel_x = random.uniform(-250, 250)
+        self.vel_y = random.uniform(250, 250)
+        self.shrink_rate = random.uniform(6, 12)
+    def update(self, dt):
+        self.vel_y += 600 * dt
+        self.x += self.vel_x * dt
+        self.y += self.vel_y * dt
+        self.size -= self.shrink_rate * dt
+    def draw(self, surface):
+        if self.size > 0:
+            py.draw.rect(surface, self.color, (round(self.x), round(self.y), round(self.size), round(self.size)))
+
+def explode(x, y, color):
+    particles = []
+    for _ in range(25):
+        particles.append(Particle(x, y, color))
+    return particles
 
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
-player = Player(250, 1200, blue, controls)
+player = Player(235, 900, blue, controls)
 scroll_y = 0
 
+particles = []
 bg = draw_gradient(width, height, sky_blue, black)
 gamestate = 'playing'
 
@@ -101,10 +125,11 @@ while run:
     if gamestate == 'playing':
         player.update(platforms)
         
-        if player.y > level_height + 500:
-            gamestate == 'win'
+        if player.y > level_height:
+            gamestate = 'lose'
+            particles = explode(player.rect.centerx, player.rect.centery, white)
         if player.y < 0:
-            gamestate == 'lose'
+            gamestate = 'win'
 
         target_scroll_y = player.rect.y - (height // 2)
         scroll_y += (target_scroll_y - scroll_y) // 10
@@ -116,12 +141,18 @@ while run:
     if gamestate == 'win':
         run = False
     if gamestate == 'lose':
-        run = False
-
+        player.vel_y = 0
+        for p in particles:
+            p.update(dt)
+        particles = [p for p in particles if p.size > 0]
     screen.blit(bg, (0, 0))
     for platform in platforms:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
-    player.draw(screen, scroll_y)
+    if gamestate == 'playing':
+        player.draw(screen, scroll_y)
+    elif gamestate == 'lose':
+        for p in particles:
+            p.draw(screen)
     py.display.update()
 
 py.quit()

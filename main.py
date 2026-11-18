@@ -8,6 +8,7 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
+font = py.font.SysFont(None, 35)
 
 blue = [0, 0, 255]
 white = [255, 255, 255]
@@ -139,8 +140,9 @@ while run:
             scroll_y = level_height
     
     if gamestate == 'win':
-        run = False
+        game_over_text = font.render("You Win!", True, black)
     if gamestate == 'lose':
+        game_over_text = font.render("You lost...", True, black)
         player.vel_y = 0
         for p in particles:
             p.update(dt)
@@ -150,9 +152,12 @@ while run:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)
-    if gamestate == 'lose':
-        for p in particles:
-            p.draw(screen)
+    if gamestate == 'lose' or gamestate == 'win':
+        game_over_rect = game_over_text.get_rect(topleft=(10, 10))
+        screen.blit(game_over_text, game_over_rect)
+        if gamestate == 'lose':
+            for p in particles:
+                p.draw(screen)
     py.display.update()
 
 py.quit()

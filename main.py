@@ -33,8 +33,9 @@ def draw_platform():
     py.draw.polygon(platform_surf, gray, platform_points)
 draw_platform()
 platforms = []
-for i in range(100):
-    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 100)))
+for i in range(25):
+    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
+    platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
 
 class Player:
     def __init__(self, x, y, color, controls):
@@ -121,7 +122,7 @@ def explode(x, y, color):
     return particles
 
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
-player = Player(235, 900, blue, controls)
+player = Player(235, 1100, blue, controls)
 scroll_y = 0
 counter = 0
 snowballs = []

@@ -84,10 +84,22 @@ class Player:
 
     def draw(self, surface, scroll_y):
         py.draw.rect(surface, self.color, (self.rect.x, round(self.rect.y - scroll_y), self.rect.width, self.rect.height))
-class Particle:
-    def __init__(self, x, y, color):
+class Snowball:
+    def __init__(self, x, y):
         self.x = float(x)
         self.y = float(y)
+        self.size = 10
+        self.color = white
+        self.vel_y = random.uniform(100, 200)
+    def update(self, dt):
+        self.y += self.vel_y * dt
+    def draw(self, surface):
+        py.draw.circle(surface, self.color, (round(self.x), round(self.y)), round(self.size))
+
+class Particle:
+    def __init__(self, center_x, center_y, color):
+        self.x = float(center_x)
+        self.y = float(center_y)
         self.size = random.randint(5, 10)
         self.color = color
         self.vel_x = random.uniform(-250, 250)
@@ -111,6 +123,8 @@ def explode(x, y, color):
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
 player = Player(235, 900, blue, controls)
 scroll_y = 0
+counter = 0
+snowballs = []
 
 particles = []
 bg = draw_gradient(width, height, sky_blue, black)
@@ -125,8 +139,14 @@ while run:
     dt = min(clock.tick(45) / 1000, 0.05)
     
     if gamestate == 'playing':
-        player.update(platforms)
+        counter += 1
+        if counter % 50 == 1:
+            snowballs.append(Snowball(random.randint(0, width), 0 - scroll_y))
         
+        player.update(platforms)
+        for s in snowballs:
+            s.update(dt)
+
         if player.y > level_height:
             gamestate = 'lose'
             particles = explode(player.rect.centerx, player.rect.centery - scroll_y, blue)
@@ -141,7 +161,7 @@ while run:
             scroll_y = level_height
     
     if gamestate == 'win':
-        game_over_text = font.render("You Win!", True, black)
+        game_over_text = font.render("You Win! Press 'r' to restart.", True, black)
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
@@ -151,22 +171,29 @@ while run:
             player.x = 235
             player.y = 900
             scroll_y = 0
+            counter = 0
+            snowballs = []
     if gamestate == 'lose':
-        game_over_text = font.render("You lost...", True, black)
+        game_over_text = font.render("You lost... press 'r' to try again.", True, black)
         player.vel_y = 0
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
+        keys = py.key.get_pressed()
         if keys[py.K_r]:
             gamestate = 'playing'
             player.x = 235
             player.y = 900
             scroll_y = 0
+            counter = 0
+            snowballs = []
     screen.blit(bg, (0, 0))
     for platform in platforms:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)
+        for s in snowballs:
+            s.draw(screen)
     if gamestate == 'lose' or gamestate == 'win':
         game_over_rect = game_over_text.get_rect(topleft=(10, 10))
         screen.blit(game_over_text, game_over_rect)

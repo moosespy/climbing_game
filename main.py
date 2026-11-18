@@ -129,7 +129,7 @@ while run:
         
         if player.y > level_height:
             gamestate = 'lose'
-            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, white)
+            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, blue)
         if player.y < 0:
             gamestate = 'win'
             particles = explode(random.randint(0, width), random.randint(0, 100) - scroll_y, red)
@@ -145,12 +145,23 @@ while run:
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
+        keys = py.key.get_pressed()
+        if keys[py.K_r]:
+            gamestate = 'playing'
+            player.x = 235
+            player.y = 900
+            scroll_y = 0
     if gamestate == 'lose':
         game_over_text = font.render("You lost...", True, black)
         player.vel_y = 0
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
+        if keys[py.K_r]:
+            gamestate = 'playing'
+            player.x = 235
+            player.y = 900
+            scroll_y = 0
     screen.blit(bg, (0, 0))
     for platform in platforms:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))

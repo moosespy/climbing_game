@@ -1,6 +1,7 @@
 import pygame as py
 import sys
 import random
+import math
 py.init()
 width = 500
 height = 600
@@ -36,6 +37,7 @@ platforms = []
 for i in range(25):
     platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
     platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
+    platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
 
 class Player:
     def __init__(self, x, y, color, controls):
@@ -50,13 +52,13 @@ class Player:
         keys = py.key.get_pressed()
         self.vel_x = 0
         if keys[self.controls['left']]:
-            self.vel_x = -1 * 60
+            self.vel_x = -2 * 60
         if keys[self.controls['right']]:
-            self.vel_x = 1 * 60
+            self.vel_x = 2 * 60
         if keys[self.controls['jump']] and self.on_platform:
-            self.vel_y = -14 * 60
+            self.vel_y = -11 * 60
             self.on_platform = False
-    def update(self, platforms):
+    def update(self, platforms, snowballs):
         self.key_input()
         self.vel_y += gravity
         if self.vel_y > 10 * 60:
@@ -71,7 +73,7 @@ class Player:
                 if self.rect.left <= platform.left and self.vel_x > 0:                        
                     self.rect.right = platform.left
                 self.x = float(self.rect.x)
-        
+
         self.y += self.vel_y * dt
         self.rect.y = round(self.y)
         hit_indices = self.rect.collidelistall(platforms)
@@ -144,13 +146,21 @@ while run:
         if counter % 50 == 1:
             snowballs.append(Snowball(random.randint(0, width), 0 - scroll_y))
         
-        player.update(platforms)
+        player.update(platforms, snowballs)
         for s in snowballs:
             s.update(dt)
-
-        if player.y > level_height:
+            closest_x = max(player.rect.left, min(s.x, player.rect.right))
+            closest_y = max(player.rect.top - scroll_y, min(s.y - scroll_y, player.rect.bottom - scroll_y))
+            distance_x = s.x - closest_x
+            distance_y = s.y - closest_y
+            distance = (distance_x ** 2) + (distance_y ** 2)
+            if distance <= (s.size ** 2):
+                print(distance)
+                gamestate = 'lose'
+                particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
+        if player.y > level_height + 200:
             gamestate = 'lose'
-            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, blue)
+            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
         if player.y < 0:
             gamestate = 'win'
             particles = explode(random.randint(0, width), random.randint(0, 100) - scroll_y, red)
@@ -170,7 +180,7 @@ while run:
         if keys[py.K_r]:
             gamestate = 'playing'
             player.x = 235
-            player.y = 900
+            player.y = 1100
             scroll_y = 0
             counter = 0
             snowballs = []
@@ -184,7 +194,7 @@ while run:
         if keys[py.K_r]:
             gamestate = 'playing'
             player.x = 235
-            player.y = 900
+            player.y = 1100
             scroll_y = 0
             counter = 0
             snowballs = []

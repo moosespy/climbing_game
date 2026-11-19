@@ -15,16 +15,23 @@ font = py.font.SysFont(None, 35)
 blue = [0, 0, 255]
 white = [255, 255, 255]
 black = [0, 0, 0]
-gray = [128, 128, 128]
-sky_blue = [135, 206, 235]
+platf = [235, 224, 210]
+gold = [232, 178, 84]
 red = [255, 0, 0]
+rust = [186, 78, 72]
+misty = [218, 229, 232]
+lower_sky = [154, 189, 207]
+upper_sky = [91, 134, 166]
+summit = [43, 66, 94]
 
 gravity = 1 * 60
 
-def draw_gradient(w, h, c_top, c_bottom):
-    bg_surf = py.Surface((1, 2))
-    bg_surf.set_at((0, 0), c_top)
-    bg_surf.set_at((0, 1), c_bottom)
+def draw_gradient(w, h, c_1, c_2, c_3, c_4):
+    bg_surf = py.Surface((1, 3))
+    bg_surf.set_at((0, 0), c_1)
+    bg_surf.set_at((0, 1), c_2)
+    bg_surf.set_at((0, 2), c_3)
+    bg_surf.set_at((0, 3), c_4)
     grad_surf = py.transform.smoothscale(bg_surf, (w, h))
     return grad_surf.convert()
 
@@ -32,7 +39,7 @@ def draw_platform():
     global platform_surf
     platform_points = [(0, 0), (20, 0), (20, 10), (0, 10)]
     platform_surf = py.Surface((20, 10)).convert()
-    py.draw.polygon(platform_surf, gray, platform_points)
+    py.draw.polygon(platform_surf, platf, platform_points)
 draw_platform()
 lvl1_platforms = []
 lvl2_platforms = [
@@ -59,13 +66,6 @@ lvl2_platforms = [
     platform_surf.get_rect(center = (400, 600)),
     platform_surf.get_rect(center = (350, 550)),
 
-    platform_surf.get_rect(center = (250, 400)),
-    platform_surf.get_rect(center = (250, 325)),
-    platform_surf.get_rect(center = (250, 250)),
-    platform_surf.get_rect(center = (250, 175)),
-    platform_surf.get_rect(center = (250, 100)),
-    platform_surf.get_rect(center = (250, 25))
-
 ]
 for i in range(25):
     lvl1_platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
@@ -73,6 +73,10 @@ for i in range(25):
     lvl1_platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
 for i in range(25):
     lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10, 475)))
+for i in range(6):
+    lvl2_platforms.append(platform_surf.get_rect(center = (250, 400 - 75 * i)))
+    lvl2_platforms.append(platform_surf.get_rect(center = (150, 400 - 75 * i)))
+    lvl2_platforms.append(platform_surf.get_rect(center = (350, 400 - 75 * i)))
 all_platforms = []
 all_platforms.append(lvl1_platforms)
 all_platforms.append(lvl2_platforms)
@@ -168,7 +172,7 @@ counter = 0
 snowballs = []
 
 particles = []
-bg = draw_gradient(width, height, black, sky_blue)
+bg = draw_gradient(width, height, summit, upper_sky, lower_sky, misty)
 gamestate = 'playing'
 
 run = True
@@ -209,7 +213,7 @@ while run:
             scroll_y = level_height
     
     if gamestate == 'win':
-        game_over_text = font.render("You Win! Press 'space' to move on!", True, black)
+        game_over_text = font.render("You Win! Press space to move on!", True, black)
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
@@ -245,6 +249,10 @@ while run:
             s.draw(screen)
     if gamestate == 'lose' or gamestate == 'win':
         game_over_rect = game_over_text.get_rect(topleft=(10, 10))
+        if gamestate == 'win':
+            py.draw.rect(screen, gold, game_over_rect)
+        else:
+            py.draw.rect(screen, rust, game_over_rect)
         screen.blit(game_over_text, game_over_rect)
         for p in particles:
             p.draw(screen)

@@ -9,7 +9,7 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
-level = 1
+level = 2
 font = py.font.SysFont(None, 35)
 
 blue = [0, 0, 255]
@@ -39,15 +39,40 @@ lvl2_platforms = [
     platform_surf.get_rect(center = (250, 1150)),
     platform_surf.get_rect(center = (250, 1075)),
     platform_surf.get_rect(center = (250, 1000)),
-    platform_surf.get_rect(center = (200, 940)),
-    platform_surf.get_rect(center = (180, 940)),
+    platform_surf.get_rect(center = (200, 950)),
+    platform_surf.get_rect(center = (180, 950)),
+    platform_surf.get_rect(center = (160, 950)),
+    platform_surf.get_rect(center = (300, 950)),
+    platform_surf.get_rect(center = (320, 950)),
+    platform_surf.get_rect(center = (340, 950)),
+    platform_surf.get_rect(center = (100, 900)),
+    platform_surf.get_rect(center = (140, 900)),
+    platform_surf.get_rect(center = (360, 900)),
+    platform_surf.get_rect(center = (400, 900)),
+    platform_surf.get_rect(center = (50, 850)),
+    platform_surf.get_rect(center = (450, 850)),
+    
+    platform_surf.get_rect(center = (400, 800)),
+    platform_surf.get_rect(center = (350, 750)),
+    platform_surf.get_rect(center = (425, 700)),
+    platform_surf.get_rect(center = (450, 650)),
+    platform_surf.get_rect(center = (400, 600)),
+    platform_surf.get_rect(center = (350, 550)),
+
+    platform_surf.get_rect(center = (250, 400)),
+    platform_surf.get_rect(center = (250, 325)),
+    platform_surf.get_rect(center = (250, 250)),
+    platform_surf.get_rect(center = (250, 175)),
+    platform_surf.get_rect(center = (250, 100)),
+    platform_surf.get_rect(center = (250, 25))
 
 ]
 for i in range(25):
     lvl1_platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
     lvl1_platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
     lvl1_platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
-
+for i in range(25):
+    lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10, 475)))
 all_platforms = []
 all_platforms.append(lvl1_platforms)
 all_platforms.append(lvl2_platforms)
@@ -110,7 +135,7 @@ class Snowball:
     def update(self, dt):
         self.y += self.vel_y * dt
     def draw(self, surface):
-        py.draw.circle(surface, self.color, (round(self.x), round(self.y)), round(self.size))
+        py.draw.circle(surface, self.color, (round(self.x), round(self.y - scroll_y)), round(self.size))
 
 class Particle:
     def __init__(self, center_x, center_y, color):
@@ -143,7 +168,7 @@ counter = 0
 snowballs = []
 
 particles = []
-bg = draw_gradient(width, height, sky_blue, black)
+bg = draw_gradient(width, height, black, sky_blue)
 gamestate = 'playing'
 
 run = True
@@ -163,12 +188,11 @@ while run:
         for s in snowballs:
             s.update(dt)
             closest_x = max(player.rect.left, min(s.x, player.rect.right))
-            closest_y = max(player.rect.top - scroll_y, min(s.y - scroll_y, player.rect.bottom - scroll_y))
+            closest_y = max(player.rect.top, min(s.y, player.rect.bottom))
             distance_x = s.x - closest_x
             distance_y = s.y - closest_y
             distance = (distance_x ** 2) + (distance_y ** 2)
             if distance <= (s.size ** 2):
-                print(distance)
                 gamestate = 'lose'
                 particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
         if player.y > level_height + 200:
@@ -193,7 +217,7 @@ while run:
         if keys[py.K_SPACE]:
             gamestate = 'playing'
             player.x = 235
-            player.y = 1100
+            player.y = 1125
             scroll_y = 0
             counter = 0
             snowballs = []
@@ -208,7 +232,7 @@ while run:
         if keys[py.K_r]:
             gamestate = 'playing'
             player.x = 235
-            player.y = 1100
+            player.y = 1125
             scroll_y = 0
             counter = 0
             snowballs = []

@@ -9,6 +9,7 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
+level = 1
 font = py.font.SysFont(None, 35)
 
 blue = [0, 0, 255]
@@ -33,11 +34,23 @@ def draw_platform():
     platform_surf = py.Surface((20, 10)).convert()
     py.draw.polygon(platform_surf, gray, platform_points)
 draw_platform()
-platforms = []
+lvl1_platforms = []
+lvl2_platforms = [
+    platform_surf.get_rect(center = (250, 1150)),
+    platform_surf.get_rect(center = (250, 1075)),
+    platform_surf.get_rect(center = (250, 1000)),
+    platform_surf.get_rect(center = (200, 940)),
+    platform_surf.get_rect(center = (180, 940)),
+
+]
 for i in range(25):
-    platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
-    platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
-    platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
+
+all_platforms = []
+all_platforms.append(lvl1_platforms)
+all_platforms.append(lvl2_platforms)
 
 class Player:
     def __init__(self, x, y, color, controls):
@@ -144,9 +157,9 @@ while run:
     if gamestate == 'playing':
         counter += 1
         if counter % 50 == 1:
-            snowballs.append(Snowball(random.randint(0, width), 0 - scroll_y))
+            snowballs.append(Snowball(random.randint(50, width - 50), 0 - scroll_y))
         
-        player.update(platforms, snowballs)
+        player.update(all_platforms[level - 1], snowballs)
         for s in snowballs:
             s.update(dt)
             closest_x = max(player.rect.left, min(s.x, player.rect.right))
@@ -172,18 +185,19 @@ while run:
             scroll_y = level_height
     
     if gamestate == 'win':
-        game_over_text = font.render("You Win! Press 'r' to restart.", True, black)
+        game_over_text = font.render("You Win! Press 'space' to move on!", True, black)
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
-        if keys[py.K_r]:
+        if keys[py.K_SPACE]:
             gamestate = 'playing'
             player.x = 235
             player.y = 1100
             scroll_y = 0
             counter = 0
             snowballs = []
+            level += 1
     if gamestate == 'lose':
         game_over_text = font.render("You lost... press 'r' to try again.", True, black)
         player.vel_y = 0
@@ -199,7 +213,7 @@ while run:
             counter = 0
             snowballs = []
     screen.blit(bg, (0, 0))
-    for platform in platforms:
+    for platform in all_platforms[level - 1]:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)

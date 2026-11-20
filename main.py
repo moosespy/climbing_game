@@ -188,6 +188,7 @@ while run:
         counter += 1
         if counter % 50 == 1:
             snowballs.append(Snowball(random.randint(50, width - 50), 0 - scroll_y))
+        if counter % 3 == 0 and score != 0:
             score -= 1
         player.update(all_platforms[level - 1], snowballs)
         for s in snowballs:
@@ -214,6 +215,7 @@ while run:
             scroll_y = level_height
         if score == 0:
             gamestate = 'lose'
+            particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
     if gamestate == 'win':
         if level < len(all_platforms):
             game_over_text = font.render("Press space to move on!", True, black)
@@ -226,27 +228,28 @@ while run:
         if keys[py.K_SPACE] and level < len(all_platforms):
             gamestate = 'playing'
             player.x = 235
-            player.y = 1125
+            player.y = 1100
             scroll_y = 0
             counter = 0
             snowballs = []
             level += 1                
     if gamestate == 'lose':
-        game_over_text = font.render("You lost... press 'r' to try again.", True, black)
+        score = 0
+        game_over_text = font.render("You lost. Press 'r' or 't'.", True, black)
         player.vel_y = 0
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
-        if keys[py.K_r] or keys[py.K_1]:
+        if keys[py.K_r] or keys[py.K_t]:
             gamestate = 'playing'
             player.x = 235
-            player.y = 1125
+            player.y = 1100
             scroll_y = 0
             counter = 0
             snowballs = []
-            score = 400
-            if keys[py.K_1]:
+            if keys[py.K_t]:
+                score = 400
                 level = 1
     screen.blit(bg, (0, 0))
     for platform in all_platforms[level - 1]:
@@ -265,7 +268,7 @@ while run:
         for p in particles:
             p.draw(screen)
     score_text = font.render(f"Score: {score}", True, black)
-    score_rect = score_text.get_rect(topright=(width-10, 10))
+    score_rect = score_text.get_rect(bottomright=(width-10, height-10))
 
     screen.blit(score_text, score_rect)
     py.display.update()

@@ -9,7 +9,8 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
-level = 2
+level = 1
+score = 400
 font = py.font.SysFont(None, 35)
 
 blue = [0, 0, 255]
@@ -187,7 +188,7 @@ while run:
         counter += 1
         if counter % 50 == 1:
             snowballs.append(Snowball(random.randint(50, width - 50), 0 - scroll_y))
-        
+            score -= 1
         player.update(all_platforms[level - 1], snowballs)
         for s in snowballs:
             s.update(dt)
@@ -211,21 +212,25 @@ while run:
             scroll_y = 0
         if scroll_y > level_height:
             scroll_y = level_height
-    
+        if score == 0:
+            gamestate = 'lose'
     if gamestate == 'win':
-        game_over_text = font.render("You Win! Press space to move on!", True, black)
+        if level < len(all_platforms):
+            game_over_text = font.render("Press space to move on!", True, black)
+        else:
+            game_over_text = font.render("You won the game!", True, black)
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
-        if keys[py.K_SPACE]:
+        if keys[py.K_SPACE] and level < len(all_platforms):
             gamestate = 'playing'
             player.x = 235
             player.y = 1125
             scroll_y = 0
             counter = 0
             snowballs = []
-            level += 1
+            level += 1                
     if gamestate == 'lose':
         game_over_text = font.render("You lost... press 'r' to try again.", True, black)
         player.vel_y = 0
@@ -233,13 +238,16 @@ while run:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
-        if keys[py.K_r]:
+        if keys[py.K_r] or keys[py.K_1]:
             gamestate = 'playing'
             player.x = 235
             player.y = 1125
             scroll_y = 0
             counter = 0
             snowballs = []
+            score = 400
+            if keys[py.K_1]:
+                level = 1
     screen.blit(bg, (0, 0))
     for platform in all_platforms[level - 1]:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
@@ -256,6 +264,10 @@ while run:
         screen.blit(game_over_text, game_over_rect)
         for p in particles:
             p.draw(screen)
+    score_text = font.render(f"Score: {score}", True, black)
+    score_rect = score_text.get_rect(topright=(width-10, 10))
+
+    screen.blit(score_text, score_rect)
     py.display.update()
 
 py.quit()

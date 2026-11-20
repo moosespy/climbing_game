@@ -246,7 +246,8 @@ while run:
             level = 1
     screen.blit(bg, (0, 0))
     for platform in all_platforms[level - 1]:
-        screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
+        if -20 <= platform.y - scroll_y <= height + 100:
+            screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)
         for s in snowballs:

@@ -166,11 +166,13 @@ def explode(x, y, color):
         particles.append(Particle(x, y, color))
     return particles
 
+def reset_game():
+    x, y, state, scroll, count = 235, 1100, 'playing', 0, 0
+    snowball = []
+    return x, y, state, scroll, count, snowball
 controls = {'left': py.K_LEFT, 'right': py.K_RIGHT, 'jump': py.K_UP}
 player = Player(235, 1100, blue, controls)
-scroll_y = 0
-counter = 0
-snowballs = []
+player.x, player.y, gamestate, scroll_y, counter, snowballs = reset_game()
 
 particles = []
 bg = draw_gradient(width, height, summit, upper_sky, lower_sky, misty)
@@ -188,7 +190,7 @@ while run:
         counter += 1
         if counter % 50 == 1:
             snowballs.append(Snowball(random.randint(50, width - 50), 0 - scroll_y))
-        if counter % 3 == 0 and score != 0:
+        if counter % 6 == 0 and score != 0:
             score -= 1
         player.update(all_platforms[level - 1], snowballs)
         for s in snowballs:
@@ -226,31 +228,20 @@ while run:
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
         if keys[py.K_SPACE] and level < len(all_platforms):
-            gamestate = 'playing'
-            player.x = 235
-            player.y = 1100
-            scroll_y = 0
-            counter = 0
-            snowballs = []
+            player.x, player.y, gamestate, scroll_y, counter, snowballs = reset_game()
             level += 1                
     if gamestate == 'lose':
         score = 0
-        game_over_text = font.render("You lost. Press 'r' or 't'.", True, black)
+        game_over_text = font.render("You lost. Press 'r' to restart.", True, black)
         player.vel_y = 0
         for p in particles:
             p.update(dt)
         particles = [p for p in particles if p.size > 0]
         keys = py.key.get_pressed()
-        if keys[py.K_r] or keys[py.K_t]:
-            gamestate = 'playing'
-            player.x = 235
-            player.y = 1100
-            scroll_y = 0
-            counter = 0
-            snowballs = []
-            if keys[py.K_t]:
-                score = 400
-                level = 1
+        if keys[py.K_r]:
+            player.x, player.y, gamestate, scroll_y, counter, snowballs = reset_game()
+            score = 400
+            level = 1
     screen.blit(bg, (0, 0))
     for platform in all_platforms[level - 1]:
         screen.blit(platform_surf, (platform.x, platform.y - scroll_y))

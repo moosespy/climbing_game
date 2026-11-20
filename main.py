@@ -197,14 +197,15 @@ while run:
         snowballs = [s for s in snowballs if s.y - scroll_y < height + 100]
         for s in snowballs:
             s.update(dt)
-            closest_x = max(player.rect.left, min(s.x, player.rect.right))
-            closest_y = max(player.rect.top, min(s.y, player.rect.bottom))
-            distance_x = s.x - closest_x
-            distance_y = s.y - closest_y
-            distance = (distance_x ** 2) + (distance_y ** 2)
-            if distance <= (s.size ** 2):
-                gamestate = 'lose'
-                particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
+            if counter % 3 == 0:
+                closest_x = max(player.rect.left, min(s.x, player.rect.right))
+                closest_y = max(player.rect.top, min(s.y, player.rect.bottom))
+                distance_x = s.x - closest_x
+                distance_y = s.y - closest_y
+                distance = (distance_x ** 2) + (distance_y ** 2)
+                if distance <= (s.size ** 2):
+                    gamestate = 'lose'
+                    particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
         if player.y > level_height + 200:
             gamestate = 'lose'
             particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
@@ -246,7 +247,7 @@ while run:
             level = 1
     screen.blit(bg, (0, 0))
     for platform in all_platforms[level - 1]:
-        if -20 <= platform.y - scroll_y <= height + 100:
+        if -10 <= platform.y - scroll_y <= height + 100:
             screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)

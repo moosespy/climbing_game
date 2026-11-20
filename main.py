@@ -9,7 +9,7 @@ height = 600
 screen = py.display.set_mode((width, height))
 clock = py.time.Clock()
 level_height = 1200
-level = 1
+level = 2
 score = 400
 font = py.font.SysFont(None, 35)
 
@@ -74,6 +74,7 @@ for i in range(25):
     lvl1_platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
 for i in range(25):
     lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10, 475)))
+    lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10 if i < 13 else 500 - i * 20, 800 - i * 10)))
 for i in range(6):
     lvl2_platforms.append(platform_surf.get_rect(center = (250, 400 - 75 * i)))
     lvl2_platforms.append(platform_surf.get_rect(center = (150, 400 - 75 * i)))
@@ -193,6 +194,7 @@ while run:
         if counter % 6 == 0 and score != 0:
             score -= 1
         player.update(all_platforms[level - 1], snowballs)
+        snowballs = [s for s in snowballs if s.y - scroll_y < height + 100]
         for s in snowballs:
             s.update(dt)
             closest_x = max(player.rect.left, min(s.x, player.rect.right))

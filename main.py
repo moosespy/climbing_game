@@ -261,10 +261,11 @@ while run:
         screen.blit(game_over_text, game_over_rect)
         for p in particles:
             p.draw(screen)
-    score_text = font.render(f"Score: {score}", True, black)
-    score_rect = score_text.get_rect(bottomright=(width-10, height-10))
-
+    if (counter % 6 == 0 and score != 0) or score == 400:
+        score_text = font.render(f"Score: {score}", True, black)
+        score_rect = score_text.get_rect(bottomright=(width-10, height-10))
     screen.blit(score_text, score_rect)
+
     py.display.update()
 
 py.quit()

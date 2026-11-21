@@ -28,7 +28,7 @@ summit = [43, 66, 94]
 gravity = 1 * 60
 
 def draw_gradient(w, h, c_1, c_2, c_3, c_4):
-    bg_surf = py.Surface((1, 3))
+    bg_surf = py.Surface((1, 4))
     bg_surf.set_at((0, 0), c_1)
     bg_surf.set_at((0, 1), c_2)
     bg_surf.set_at((0, 2), c_3)
@@ -41,7 +41,13 @@ def draw_platform():
     platform_points = [(0, 0), (20, 0), (20, 10), (0, 10)]
     platform_surf = py.Surface((20, 10)).convert()
     py.draw.polygon(platform_surf, platf, platform_points)
+def draw_spike():
+    global spike_surf
+    spike_points = [(0, 6), (6, 6), (3, 0)]
+    spike_surf = py.Surface((6, 6), py.SRCALPHA).convert_alpha()
+    py.draw.polygon(spike_surf, red, spike_points)
 draw_platform()
+draw_spike()
 lvl1_platforms = []
 lvl2_platforms = [
     platform_surf.get_rect(center = (250, 1150)),
@@ -66,8 +72,9 @@ lvl2_platforms = [
     platform_surf.get_rect(center = (450, 650)),
     platform_surf.get_rect(center = (400, 600)),
     platform_surf.get_rect(center = (350, 550)),
-
 ]
+lvl1_spikes = []
+lvl2_spikes = []
 for i in range(25):
     lvl1_platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
     lvl1_platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
@@ -82,6 +89,16 @@ for i in range(6):
 all_platforms = []
 all_platforms.append(lvl1_platforms)
 all_platforms.append(lvl2_platforms)
+
+for platform in lvl1_platforms:
+    if random.randint(1, 5) == 1:
+        lvl1_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx, platform.top)))
+for platform in lvl2_platforms:
+    if random.randint(1, 5) == 1:
+        lvl2_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx, platform.top)))
+all_spikes = []
+all_spikes.append(lvl1_spikes)
+all_spikes.append(lvl2_spikes)
 
 class Player:
     def __init__(self, x, y, color, controls):
@@ -249,6 +266,9 @@ while run:
     for platform in all_platforms[level - 1]:
         if -10 <= platform.y - scroll_y <= height + 100:
             screen.blit(platform_surf, (platform.x, platform.y - scroll_y))
+    for spike in all_spikes[level - 1]:
+        if -10 <= spike.y - scroll_y <= height + 100:
+            screen.blit(spike_surf, (spike.x, spike.y - scroll_y))
     if gamestate == 'playing':
         player.draw(screen, scroll_y)
         for s in snowballs:

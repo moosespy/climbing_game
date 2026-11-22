@@ -64,7 +64,9 @@ lvl2_platforms = [
     platform_surf.get_rect(center = (360, 900)),
     platform_surf.get_rect(center = (400, 900)),
     platform_surf.get_rect(center = (50, 850)),
+    platform_surf.get_rect(center = (70, 850)),
     platform_surf.get_rect(center = (450, 850)),
+    platform_surf.get_rect(center = (470, 850)),
     
     platform_surf.get_rect(center = (400, 800)),
     platform_surf.get_rect(center = (350, 750)),

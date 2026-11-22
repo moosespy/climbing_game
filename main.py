@@ -79,10 +79,11 @@ lvl1_spikes = []
 lvl2_spikes = []
 for i in range(25):
     plat_count = 1
-    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (5 + plat_count), level_height - i * 110 - 50)))
-    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (4 + plat_count), level_height - i * 110)))
-    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (3 + plat_count), level_height - i * 110 - 50)))
-    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (2 + plat_count), level_height - i * 110)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (6 + plat_count), level_height - i * 110 - 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (5 + plat_count), level_height - i * 110)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (4 + plat_count), level_height - i * 110 - 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (3 + plat_count), level_height - i * 110)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (2 + plat_count), level_height - i * 110 - 50)))
 
 
 for i in range(25):
@@ -97,10 +98,10 @@ all_platforms.append(lvl1_platforms)
 all_platforms.append(lvl2_platforms)
 
 for platform in lvl1_platforms:
-    if random.randint(1, 5) == 1:
+    if random.randint(1, 4) == 1:
         lvl1_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx + random.uniform(-6, 6), platform.top)))
 for platform in lvl2_platforms:
-    if random.randint(1, 5) == 1:
+    if random.randint(1, 6) == 1:
         lvl2_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx + random.uniform(-6, 6), platform.top)))
 all_spikes = []
 all_spikes.append(lvl1_spikes)

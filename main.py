@@ -76,9 +76,13 @@ lvl2_platforms = [
 lvl1_spikes = []
 lvl2_spikes = []
 for i in range(25):
-    lvl1_platforms.append(platform_surf.get_rect(center = (250, level_height - i * 110)))
-    lvl1_platforms.append(platform_surf.get_rect(center = (200, level_height - i * 110 + 50)))
-    lvl1_platforms.append(platform_surf.get_rect(center = (300, level_height - i * 110 + 50)))
+    plat_count = 1
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (5 + plat_count), level_height - i * 110 - 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (4 + plat_count), level_height - i * 110)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (3 + plat_count), level_height - i * 110 - 50)))
+    lvl1_platforms.append(platform_surf.get_rect(center = (50 * (2 + plat_count), level_height - i * 110)))
+
+
 for i in range(25):
     lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10, 475)))
     lvl2_platforms.append(platform_surf.get_rect(center = (i * 20 + 10 if i < 13 else 500 - i * 20, 800 - i * 10)))
@@ -92,10 +96,10 @@ all_platforms.append(lvl2_platforms)
 
 for platform in lvl1_platforms:
     if random.randint(1, 5) == 1:
-        lvl1_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx, platform.top)))
+        lvl1_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx + random.uniform(-6, 6), platform.top)))
 for platform in lvl2_platforms:
     if random.randint(1, 5) == 1:
-        lvl2_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx, platform.top)))
+        lvl2_spikes.append(spike_surf.get_rect(midbottom = (platform.centerx + random.uniform(-6, 6), platform.top)))
 all_spikes = []
 all_spikes.append(lvl1_spikes)
 all_spikes.append(lvl2_spikes)
@@ -221,6 +225,16 @@ while run:
                 distance_y = s.y - closest_y
                 distance = (distance_x ** 2) + (distance_y ** 2)
                 if distance <= (s.size ** 2):
+                    gamestate = 'lose'
+                    particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
+        for s in all_spikes[level - 1]:
+            if counter % 3 == 0:
+                closest_x = max(player.rect.left, min(s.x, player.rect.right))
+                closest_y = max(player.rect.top, min(s.y, player.rect.bottom))
+                distance_x = s.x - closest_x
+                distance_y = s.y - closest_y
+                distance = (distance_x ** 2) + (distance_y ** 2)
+                if player.rect.colliderect(s):
                     gamestate = 'lose'
                     particles = explode(player.rect.centerx, player.rect.centery - scroll_y, player.color)
         if player.y > level_height + 200:

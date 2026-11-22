@@ -29,3 +29,5 @@ A good amount of the coding time was spent improving memory efficiency, so only 
 
 # Closing Notes
 Thanks for reviewing! This is my 4th pygame project ever, and 4th for Terra. I definitely learned a good amount this week, though not as much as last week, I think.
+
+To run the game, click here: https://codehs.com/sandbox/trana0357/mountain-climber/run and press 'Run'. You may have to click the game screen to ensure keyboard inputs register on the game screen.

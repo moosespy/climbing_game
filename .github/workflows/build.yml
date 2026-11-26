@@ -1,0 +1,30 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch: # Lets you trigger this manually with a button click
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name "TerraShipGame" --add-data "assets;assets" main.py
+          # NOTE: If you do NOT have an assets folder, delete `--add-data "assets;assets"` from the line above!
+
+      - name: Upload EXE Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Game-Build
+          path: dist/TerraShipGame.exe

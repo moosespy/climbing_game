@@ -20,7 +20,7 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name "Mountain Climber" main.py
+          pyinstaller --onefile --windowed --name "MountainClimber" main.py
           # NOTE: If you do NOT have an assets folder, delete `--add-data "assets;assets"` from the line above!
 
       - name: Upload EXE Artifact
